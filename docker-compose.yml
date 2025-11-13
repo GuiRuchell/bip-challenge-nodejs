@@ -1,24 +1,25 @@
-
-version: '3.8'
-
+version: "3.8"
 services:
-  app:
-    build: .
-    container_name: desafio_backend_app
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - MONGO_URI=mongodb://mongo:27017/desafio
-      - JWT_SECRET=supersecret
-    depends_on:
-      - mongo
-    command: npm run start:dev
-
   mongo:
-    image: mongo:6
+    image: mongo:6.0
     container_name: desafio_backend_mongo
     ports:
       - "27017:27017"
     volumes:
       - ./data/mongo:/data/db
+
+  app:
+    build: .
+    container_name: desafio_backend_app
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/desafio
+      - JWT_SECRET=supersecret
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo
