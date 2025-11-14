@@ -16,13 +16,11 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
 app.use('/api/transactions', transactionRoutes);
 
-// health
 app.get('/', (req, res) => res.json({ ok: true }));
 
 app.use(errorHandler);

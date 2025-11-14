@@ -1,35 +1,38 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
 import { registerSchema, loginSchema } from '../utils/validators.js';
+import { registerService, loginService } from '../services/authService.js';
 
-function generateToken(user) {
-  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-  });
-}
+export const register = async (req, res) => {
+  try {
+    const { error, value } = registerSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.message });
 
-export async function register(req, res) {
-  const { error, value } = registerSchema.validate(req.body);
-  if (error) return res.status(400).json({ message: error.message });
+    const result = await registerService(value);
 
-  const exists = await User.findOne({ email: value.email });
-  if (exists) return res.status(409).json({ message: 'Email already registered' });
+    return res.status(201).json(result);
+  } catch (err) {
+    if (err.message === 'EMAIL_ALREADY_EXISTS') {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
 
-  const user = await User.create(value);
-  const token = generateToken(user);
-  return res.status(201).json({ user: { id: user._id, name: user.name, email: user.email }, token });
-}
+    console.error('Register error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
-export async function login(req, res) {
-  const { error, value } = loginSchema.validate(req.body);
-  if (error) return res.status(400).json({ message: error.message });
+export const login = async (req, res) => {
+  try {
+    const { error, value } = loginSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.message });
 
-  const user = await User.findOne({ email: value.email });
-  if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    const result = await loginService(value);
 
-  const match = await user.comparePassword(value.password);
-  if (!match) return res.status(401).json({ message: 'Invalid credentials' });
+    return res.json(result);
+  } catch (err) {
+    if (err.message === 'INVALID_CREDENTIALS') {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-  const token = generateToken(user);
-  return res.json({ user: { id: user._id, name: user.name, email: user.email }, token });
-}
+    console.error('Login error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};

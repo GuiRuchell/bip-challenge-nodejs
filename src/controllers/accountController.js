@@ -1,4 +1,8 @@
-import Account from '../models/Account.js';
+import {
+  createAccountService,
+  getAccountsService,
+  getAccountService
+} from '../services/accountService.js';
 
 export const createAccount = async (req, res) => {
   try {
@@ -10,39 +14,39 @@ export const createAccount = async (req, res) => {
 
     const userId = req.user._id;
 
-    const account = new Account({
-      user: userId,
-      type,
-      balance
-    });
+    const account = await createAccountService(userId, type, balance);
 
-    await account.save();
-    res.status(201).json(account);
+    return res.status(201).json(account);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('CreateAccount Error:', error);
+    return res.status(500).json({ message: 'Failed to create account' });
   }
 };
 
 export const getAccounts = async (req, res) => {
   try {
-    const accounts = await Account.find({ user: req.user._id });
-    res.json(accounts);
+    const accounts = await getAccountsService(req.user._id);
+
+    return res.json(accounts);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('GetAccounts Error:', error);
+    return res.status(500).json({ message: 'Failed to fetch accounts' });
   }
 };
 
 export const getAccount = async (req, res) => {
   try {
     const { id } = req.params;
-    const account = await Account.findOne({ _id: id, user: req.user._id });
+
+    const account = await getAccountService(req.user._id, id);
 
     if (!account) {
       return res.status(404).json({ message: 'Account not found' });
     }
 
-    res.json(account);
+    return res.json(account);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('GetAccount Error:', error);
+    return res.status(500).json({ message: 'Failed to fetch account' });
   }
 };

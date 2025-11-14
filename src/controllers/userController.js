@@ -1,11 +1,11 @@
-import User from '../models/User.js';
+import * as userService from '../services/userService.js';
 
 export async function getProfile(req, res) {
-  const user = req.user;
-  return res.json({ id: user._id, name: user.name, email: user.email });
+  const profile = await userService.getProfile(req.user);
+  return res.json(profile);
 }
 
 export async function listUsers(req, res) {
-  const users = await User.find().select('-password');
+  const users = await userService.listUsers();
   return res.json(users);
 }
