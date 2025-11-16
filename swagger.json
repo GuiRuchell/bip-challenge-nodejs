@@ -1,0 +1,23 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Desafio Backend - API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register",
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Register" } } } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Register": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" } }
+      }
+    }
+  }
+}
