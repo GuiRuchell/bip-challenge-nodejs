@@ -1,8 +1,8 @@
 export default {
-  testEnvironment: "node", // Node.js
-  transform: {},            // sem Babel
+  testEnvironment: "node",
+  transform: {},       
   moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1.js" // corrige imports relativos
+    "^(\\.{1,2}/.*)\\.js$": "$1.js"
   },
   verbose: true
 };
